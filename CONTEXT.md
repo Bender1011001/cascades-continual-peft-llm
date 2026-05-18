@@ -14,6 +14,14 @@ updated: 2026-05-18
 
 ## Recent Work
 
+### 2026-05-18 — SBA synthetic CUDA gate scaffold
+- Added the Task 5 synthetic CUDA stress gate scaffold [`experiments/sba_validation/run_cuda_synthetic_gate.py`](experiments/sba_validation/run_cuda_synthetic_gate.py:1) because SBA needs a bounded, explicit GPU stress gate before any patched-model or training work, while preserving the requirement not to run CUDA until approval.
+- Extended [`tests/test_sba_validation_artifacts.py`](tests/test_sba_validation_artifacts.py:1) with a CPU-only case-shape test for the three bounded synthetic labels: `b1_h2_q16_k16_d32_float32_mask0.00`, `b1_h2_q32_k32_d64_float32_mask0.25`, and `b1_h4_q64_k64_d64_float16_mask0.50`.
+- RED evidence: `python -m pytest tests\test_sba_validation_artifacts.py -k cuda_synthetic_cases -q` failed during collection with `ModuleNotFoundError: No module named 'experiments.sba_validation.run_cuda_synthetic_gate'` after adding the test and before adding the script.
+- GREEN CPU-only evidence after implementing the scaffold: `python -m pytest tests\test_sba_validation_artifacts.py -k cuda_synthetic_cases -q && python -m py_compile experiments\sba_validation\run_cuda_synthetic_gate.py` exited 0 with 1 selected test passing and no `py_compile` output; `python -m pytest tests\test_sba_validation_artifacts.py -q` passed 5 tests. The only observed warning was the pre-existing pytest-asyncio default fixture loop scope deprecation warning.
+- The actual CUDA gate command was deliberately not run because Task 5 requires explicit GPU approval after the CPU math gate artifact is valid. No CUDA artifacts were produced or committed in this CPU-only scaffold step.
+- Scope kept to CUDA gate scaffold/test/context only; no CUDA workload, model patching, training runner, larger-suite escalation, or catastrophic-forgetting solution claim was performed.
+
 ### 2026-05-18 — SBA CPU math gate artifact writer
 - Added the Task 4 CPU math gate script [`experiments/sba_validation/run_cpu_math_gate.py`](experiments/sba_validation/run_cpu_math_gate.py:1) because the standalone SBA formula checks need a durable JSON/log artifact before CUDA or model-patching work.
 - Extended [`tests/test_sba_validation_artifacts.py`](tests/test_sba_validation_artifacts.py:1) with a CPU gate payload-shape test that validates `valid=true`, formula equivalence tolerance, zero masked leakage, signed-L1 bound, finite output/gradient checks, Jacobian claim status recording, and artifact/log creation.
