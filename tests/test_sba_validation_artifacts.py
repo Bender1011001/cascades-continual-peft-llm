@@ -7,6 +7,7 @@ from experiments.sba_validation.artifact_utils import (
 )
 from experiments.sba_validation.run_cuda_synthetic_gate import CUDA_SYNTHETIC_CASES, build_case_label
 from experiments.sba_validation.run_cpu_math_gate import run_cpu_math_gate
+from experiments.sba_validation.run_tiny_model_gate import TINY_MODEL_GATE_COMMAND
 
 
 def test_collect_nonfinite_paths_finds_nested_nan_and_inf():
@@ -59,3 +60,8 @@ def test_cuda_synthetic_cases_are_bounded_and_labeled():
         "b1_h2_q32_k32_d64_float32_mask0.25",
         "b1_h4_q64_k64_d64_float16_mask0.50",
     ]
+
+
+def test_tiny_model_gate_command_uses_sba_patch_and_threshold():
+    assert "--enable-sba-patch" in TINY_MODEL_GATE_COMMAND
+    assert "--vram-threshold-mb 7500" in TINY_MODEL_GATE_COMMAND

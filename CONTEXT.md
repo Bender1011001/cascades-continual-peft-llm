@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: SBA Task 7 default-off train wiring complete in isolated worktree; Task 6 code-quality review approved; next step is Task 8 only after review/authorization; no GPU jobs were run; catastrophic forgetting remains unsolved
+status: SBA Task 8 tiny patched-model gate scaffold prepared in isolated worktree; CPU-safe verification passed; no GPU/model download/tiny-gate execution occurred; catastrophic forgetting remains unsolved
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,14 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — SBA tiny patched-model gate scaffold
+- Added the Task 8 tiny patched-model gate scaffold [`experiments/sba_validation/run_tiny_model_gate.py`](experiments/sba_validation/run_tiny_model_gate.py:1) because SBA needs a bounded patched-model forward/backward gate surface after the default-off train wiring, but only as a CPU-safe scaffold until explicit GPU approval.
+- Exposed [`DEFAULT_MODEL_ID`](experiments/sba_validation/run_tiny_model_gate.py:18) as `p-e-w/Qwen3-4B-Instruct-2507-heretic` and [`TINY_MODEL_GATE_COMMAND`](experiments/sba_validation/run_tiny_model_gate.py:19) with `--enable-sba-patch` and `--vram-threshold-mb 7500`, matching the Task 8 guardrail semantics.
+- Implemented [`run_tiny_model_gate()`](experiments/sba_validation/run_tiny_model_gate.py:26) to produce durable gate artifacts through [`gate_payload()`](experiments/sba_validation/artifact_utils.py:52) and [`write_json()`](experiments/sba_validation/artifact_utils.py:22), including the CUDA-unavailable failure path and repo-root path insertion for direct script execution imports.
+- Extended [`tests/test_sba_validation_artifacts.py`](tests/test_sba_validation_artifacts.py:1) with the planned CPU-only command-constant test, verifying that the tiny gate command opts into the SBA patch and carries the 7500 MB VRAM threshold.
+- CPU-safe verification passed: `python -m pytest tests\test_sba_validation_artifacts.py -k tiny_model_gate_command -q && python -m py_compile experiments\sba_validation\run_tiny_model_gate.py` exited 0; pytest selected 1 test, deselected 5, and reported `1 passed`; `py_compile` produced no stdout/stderr. The only observed warning was the pre-existing pytest-asyncio default fixture loop-scope deprecation warning.
+- Strict non-goals honored: [`run_tiny_model_gate.py`](experiments/sba_validation/run_tiny_model_gate.py:1) was not executed, no model weights were downloaded or loaded, no CUDA/training/GPU workload ran, no tiny gate artifact was produced, and Task 9+ was not touched.
 
 ### 2026-05-18 — SBA default-off train wiring
 - Completed the fast Task 6 code-quality review for [`cascades/config.py`](cascades/config.py:15), [`cascades/sba_patch.py`](cascades/sba_patch.py:1), and [`tests/test_sba_patch.py`](tests/test_sba_patch.py:1). Verdict: APPROVED; no blocking correctness, default-behavior, or scope issue was found, so Task 7 proceeded immediately.
