@@ -55,6 +55,9 @@ class AblationConfig:
     frozen_basis_variance_threshold: float = 0.05
     # Optional cap on newly admitted frozen-basis directions per freeze call.
     frozen_basis_top_k_per_freeze: int | None = None
+    # Symmetric Bipolar Attention validation patch. Default-off; not production attention.
+    enable_symmetric_bipolar_attention: bool = False
+    sba_formula_variant: str = "sba-v1-valid-position-sinh-cosh-shared-denominator"
 
 
 # Convenience instance with all components enabled (production default)

@@ -14,6 +14,14 @@ updated: 2026-05-18
 
 ## Recent Work
 
+### 2026-05-18 — SBA default-off patch helper foundation
+- Added default-off SBA validation fields to [`AblationConfig`](cascades/config.py:15): `enable_symmetric_bipolar_attention=false` and formula variant `sba-v1-valid-position-sinh-cosh-shared-denominator`, because model patching must remain opt-in and artifact-identifiable.
+- Added the initial reversible patch helper [`cascades/sba_patch.py`](cascades/sba_patch.py:1), including supported attention class-name detection, `SbaPatchError`, patch-report collection, attention-mask normalization, and a bound SBA forward replacement that uses [`sba_value_attention()`](cascades/math_ops.py:140).
+- Added CPU tests in [`tests/test_sba_patch.py`](tests/test_sba_patch.py:1) proving the default config is disabled, toy attention modules are counted and marked, patched toy attention returns finite output plus signed weights with row L1 at most 1, unsupported models raise instead of silently falling back to baseline, and `collect_patch_report()` detects enabled modules.
+- RED evidence: `python -m pytest tests\test_sba_patch.py -q` failed during collection with `ModuleNotFoundError: No module named 'cascades.sba_patch'` after adding the tests and before adding the helper.
+- GREEN evidence after implementing the helper and config fields: `python -m pytest tests\test_sba_patch.py -q` passed 5 tests, and `python -m py_compile cascades\config.py cascades\sba_patch.py` exited 0 with no output. The Task 6 plan text expected a `6 passed` summary but provided five concrete tests; the implemented test file matches the five planned test functions.
+- Scope kept to default-off config, patch helper, tests, and context only; no train wiring, CUDA execution, model load, patched-model GPU run, larger-suite escalation, or catastrophic-forgetting solution claim was performed.
+
 ### 2026-05-18 — SBA synthetic CUDA gate scaffold
 - Added the Task 5 synthetic CUDA stress gate scaffold [`experiments/sba_validation/run_cuda_synthetic_gate.py`](experiments/sba_validation/run_cuda_synthetic_gate.py:1) because SBA needs a bounded, explicit GPU stress gate before any patched-model or training work, while preserving the requirement not to run CUDA until approval.
 - Extended [`tests/test_sba_validation_artifacts.py`](tests/test_sba_validation_artifacts.py:1) with a CPU-only case-shape test for the three bounded synthetic labels: `b1_h2_q16_k16_d32_float32_mask0.00`, `b1_h2_q32_k32_d64_float32_mask0.25`, and `b1_h4_q64_k64_d64_float16_mask0.50`.
