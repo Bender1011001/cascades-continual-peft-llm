@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: SBA Task 8 tiny patched-model gate scaffold prepared in isolated worktree; CPU-safe verification passed; no GPU/model download/tiny-gate execution occurred; catastrophic forgetting remains unsolved
+status: SBA Task 8 tiny patched-model gate code-quality hardening prepared in isolated worktree; CPU-safe verification passed; no GPU/model download/tiny-gate execution occurred; catastrophic forgetting remains unsolved
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,13 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — SBA tiny patched-model gate code-quality hardening
+- Fixed the Task 8 code-quality review changes in [`experiments/sba_validation/run_tiny_model_gate.py`](experiments/sba_validation/run_tiny_model_gate.py:1) because importing the command constant from tests must stay CPU-safe and dependency-light while GPU-path failures still need durable artifacts.
+- Moved the heavy Transformer imports for `AutoModelForCausalLM`, `AutoTokenizer`, and `BitsAndBytesConfig` into the CUDA-only model-load branch after `torch.cuda.is_available()` passes, preserving the existing [`TINY_MODEL_GATE_COMMAND`](experiments/sba_validation/run_tiny_model_gate.py:21) constant and default gate behavior.
+- Added invalid-artifact handling around CUDA setup, model load, SBA patching, forward pass, backward pass, and VRAM measurement so exceptions are converted through [`gate_payload()`](experiments/sba_validation/artifact_utils.py:52) and [`write_json()`](experiments/sba_validation/artifact_utils.py:22) before [`main()`](experiments/sba_validation/run_tiny_model_gate.py:250) exits with code 2 on an invalid payload.
+- CPU-safe verification passed: `python -m pytest tests\test_sba_validation_artifacts.py -k tiny_model_gate_command -q && python -m py_compile experiments\sba_validation\run_tiny_model_gate.py` exited 0; pytest selected 1 test, deselected 5, and reported `1 passed`; `py_compile` produced no stdout/stderr. The only observed warning was the pre-existing pytest-asyncio default fixture loop-scope deprecation warning.
+- Strict non-goals honored: [`run_tiny_model_gate.py`](experiments/sba_validation/run_tiny_model_gate.py:1) was not executed, no model weights were downloaded or loaded, no CUDA/training/GPU workload ran, no tiny gate artifact was produced, and Task 9+ was not touched.
 
 ### 2026-05-18 — SBA tiny patched-model gate scaffold
 - Added the Task 8 tiny patched-model gate scaffold [`experiments/sba_validation/run_tiny_model_gate.py`](experiments/sba_validation/run_tiny_model_gate.py:1) because SBA needs a bounded patched-model forward/backward gate surface after the default-off train wiring, but only as a CPU-safe scaffold until explicit GPU approval.
