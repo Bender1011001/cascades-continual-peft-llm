@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import torch
 import torch.nn as nn
@@ -67,3 +69,13 @@ def test_collect_patch_report_detects_enabled_modules():
     report = collect_patch_report(model)
     assert report["patched_module_count"] == 2
     assert report["patched_module_names"] == ["layers.0", "layers.1"]
+
+
+def test_train_wires_sba_patch_after_model_load():
+    source = Path("train.py").read_text(encoding="utf-8")
+    load_index = source.index("AutoModelForCausalLM.from_pretrained")
+    patch_index = source.index("patch_report = apply_sba_patch(model)")
+    inject_index = source.index("inject_cascades(")
+    assert load_index < patch_index < inject_index
+    assert "enable_sba_patch: bool = False" in source
+    assert "sba_patch_report_path: str | None = None" in source

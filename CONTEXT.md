@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: symmetric bipolar attention validation artifact utility foundation added in isolated worktree; next step is Task 3 review, then CPU math gate writer; no GPU jobs were run; catastrophic forgetting remains unsolved
+status: SBA Task 7 default-off train wiring complete in isolated worktree; Task 6 code-quality review approved; next step is Task 8 only after review/authorization; no GPU jobs were run; catastrophic forgetting remains unsolved
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,14 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — SBA default-off train wiring
+- Completed the fast Task 6 code-quality review for [`cascades/config.py`](cascades/config.py:15), [`cascades/sba_patch.py`](cascades/sba_patch.py:1), and [`tests/test_sba_patch.py`](tests/test_sba_patch.py:1). Verdict: APPROVED; no blocking correctness, default-behavior, or scope issue was found, so Task 7 proceeded immediately.
+- Wired optional default-off SBA patching in [`train.py`](train.py:195) by adding `enable_sba_patch=false` and optional `sba_patch_report_path` parameters after the VRAM threshold parameter, documenting them, importing the patch/report helpers, and applying [`apply_sba_patch()`](cascades/sba_patch.py:76) immediately after [`AutoModelForCausalLM.from_pretrained`](train.py:271) returns the model and before PEFT preparation or CASCADES adapter injection.
+- Added the planned source-level ordering test in [`tests/test_sba_patch.py`](tests/test_sba_patch.py:74) because this feature must prove the model-load → SBA-patch → CASCADES-injection ordering while preserving baseline behavior when the flag remains false.
+- RED evidence before wiring: `python -m pytest tests\test_sba_patch.py -k train_wires -q` failed with `ValueError: substring not found`, proving the train wiring was absent.
+- GREEN evidence after wiring: `python -m pytest tests\test_sba_patch.py -q && python -m py_compile train.py cascades\sba_patch.py` exited 0; pytest reported 6 passed and `py_compile` produced no stdout/stderr. The only observed warning was the pre-existing pytest-asyncio default fixture loop-scope deprecation warning.
+- Scope kept to Task 7 wiring/test/context only; no GPU command, model download/load, patched-model forward gate, training run, Task 8+ work, or catastrophic-forgetting solution claim was performed.
 
 ### 2026-05-18 — SBA default-off patch helper foundation
 - Added default-off SBA validation fields to [`AblationConfig`](cascades/config.py:15): `enable_symmetric_bipolar_attention=false` and formula variant `sba-v1-valid-position-sinh-cosh-shared-denominator`, because model patching must remain opt-in and artifact-identifiable.

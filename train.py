@@ -17,6 +17,7 @@ import argparse
 import math
 import sys
 import time
+from pathlib import Path
 
 # Windows cp1252 consoles can't print the emoji in sleep.py / adapters.py.
 # Reconfigure stdout/stderr to UTF-8 so the full log renders correctly.
@@ -43,8 +44,10 @@ from cascades.injection import (
 )
 from cascades.data import prepare_data, diagnose_per_example_loss, NUM_TASKS
 from cascades.eval import evaluate_generative, STRUCTURED_SYSTEM_PROMPT
+from cascades.sba_patch import SbaPatchError, apply_sba_patch
 from cascades.sleep import SleepConsolidation, SleepConfig
 from cascades.vram_monitor import log_vram, clear_cache, reset_peak_stats, check_oom_risk
+from experiments.sba_validation.artifact_utils import write_json
 
 
 # ---------------------------------------------------------------------------
@@ -210,6 +213,8 @@ def train_cascades(
     config: AblationConfig = DEFAULT_CONFIG,
     abort_on_nonfinite: bool = False,
     vram_threshold_mb: float | None = None,
+    enable_sba_patch: bool = False,
+    sba_patch_report_path: str | None = None,
 ) -> np.ndarray:
     """Run complete CASCADES continual learning pipeline.
 
@@ -233,6 +238,8 @@ def train_cascades(
         config: Ablation configuration.
         abort_on_nonfinite: Opt-in guardrail that aborts on non-finite train/eval loss.
         vram_threshold_mb: Optional opt-in hard peak VRAM threshold in MB.
+        enable_sba_patch: Default-off SBA validation patch flag.
+        sba_patch_report_path: Optional JSON path proving installed SBA patch modules.
 
     Returns:
         Accuracy matrix (num_tasks x num_tasks).
@@ -269,6 +276,17 @@ def train_cascades(
     model = AutoModelForCausalLM.from_pretrained(
         model_id, quantization_config=bnb_config, device_map="auto"
     )
+    if enable_sba_patch:
+        try:
+            patch_report = apply_sba_patch(model)
+        except SbaPatchError:
+            raise
+        if sba_patch_report_path is not None:
+            write_json(Path(sba_patch_report_path), patch_report)
+        print(
+            "SBA patch installed: "
+            f"{patch_report['patched_module_count']} attention modules"
+        )
 
     from peft import prepare_model_for_kbit_training
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
