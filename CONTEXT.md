@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: SBA Task 9 paired reduced validation runner CPU-safe scaffold prepared in isolated worktree; targeted CPU verification passed; no paired training/GPU/model work occurred; catastrophic forgetting remains unsolved
+status: SBA Task 10 reporting packet scaffold prepared in isolated worktree; packet generation and syntax verification passed; no paired training/GPU/model work occurred; catastrophic forgetting remains unsolved
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,13 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — SBA validation reporting packet scaffold
+- Added the Task 10 reporting README [`experiments/sba_validation/README.md`](experiments/sba_validation/README.md:1) because the SBA validation directory needs a durable gate-order summary before result-critic routing. It records the CPU math, synthetic CUDA, tiny patched-model, paired reduced, and larger-suite escalation order; SBA remains default-off; and larger-suite escalation remains blocked pending result critic review plus explicit user approval.
+- Added [`experiments/sba_validation/write_result_critic_packet.py`](experiments/sba_validation/write_result_critic_packet.py:1) with [`write_packet()`](experiments/sba_validation/write_result_critic_packet.py:79) because available gate artifacts need to be summarized without crashing when CUDA, tiny-model, or paired reduced artifacts are absent. Missing gate artifacts are reported as `valid=false` with missing-artifact reasons.
+- Generated [`experiments/sba_validation/RESULT_CRITIC_PACKET.md`](experiments/sba_validation/RESULT_CRITIC_PACKET.md:1) from current available artifacts. The packet reports CPU math valid, synthetic CUDA missing/invalid, tiny patched-model missing/invalid, paired reduced comparison missing/invalid, Jacobian claim status `falsified`, missing VRAM/paired deltas for unrun gates, all prior gates passed false, and larger-suite escalation allowed now false.
+- Verification passed inside the isolated [`sba-validation`](.worktrees/sba-validation) worktree: `python -m py_compile experiments\sba_validation\write_result_critic_packet.py && python experiments\sba_validation\write_result_critic_packet.py --root experiments\sba_validation --out experiments\sba_validation\RESULT_CRITIC_PACKET.md` exited 0. `py_compile` produced no stdout/stderr and the packet writer printed `Wrote experiments\sba_validation\RESULT_CRITIC_PACKET.md`.
+- Strict non-goals honored: no CUDA gate was run, no tiny model gate was run, no model weights were loaded or downloaded, no paired training or larger-suite experiment ran, no Task 11+ work was started, no larger-suite escalation was approved, and no catastrophic-forgetting solution claim is made.
 
 ### 2026-05-18 — SBA paired reduced validation runner CPU scaffold
 - Added the Task 9 paired reduced validation runner scaffold [`experiments/sba_validation/run_paired_reduced_sba.py`](experiments/sba_validation/run_paired_reduced_sba.py:1) because SBA needs a fresh same-seed reduced-suite control/treatment runner before any permission-gated paired training. The module exposes [`REASONING3_TASKS`](experiments/sba_validation/run_paired_reduced_sba.py:15) and [`PAIRED_REDUCED_CONFIG`](experiments/sba_validation/run_paired_reduced_sba.py:20), writes task/config/status/metrics/instrumentation artifacts, keeps the heavy training import inside [`run_arm()`](experiments/sba_validation/run_paired_reduced_sba.py:45), and inserts the repo root for direct nested script execution.
