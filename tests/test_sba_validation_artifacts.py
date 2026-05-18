@@ -5,6 +5,7 @@ from experiments.sba_validation.artifact_utils import (
     gate_payload,
     validate_required_fields,
 )
+from experiments.sba_validation.run_cpu_math_gate import run_cpu_math_gate
 
 
 def test_collect_nonfinite_paths_finds_nested_nan_and_inf():
@@ -33,3 +34,18 @@ def test_gate_payload_rejects_nonfinite_numbers():
     )
     assert payload["valid"] is False
     assert "checks.bad_value" in payload["failure_reasons"][0]
+
+
+def test_cpu_math_gate_payload_is_valid_and_records_jacobian_status(tmp_path):
+    artifact_path = tmp_path / "cpu_math_gate.json"
+    log_path = tmp_path / "cpu_math_gate.log"
+    payload = run_cpu_math_gate(artifact_path=artifact_path, log_path=log_path)
+    assert payload["valid"] is True
+    assert payload["checks"]["formula_equivalence_max_diff"] <= 1e-8
+    assert payload["checks"]["max_masked_leakage"] == 0.0
+    assert payload["checks"]["max_signed_l1"] <= 1.0 + 1e-8
+    assert payload["checks"]["finite_outputs"] is True
+    assert payload["checks"]["finite_gradients"] is True
+    assert payload["checks"]["jacobian_claim_status"] in {"supported", "falsified"}
+    assert artifact_path.exists()
+    assert log_path.exists()

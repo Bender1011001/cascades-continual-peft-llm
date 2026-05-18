@@ -1,0 +1,4 @@
+CPU math gate completed
+valid=True
+failure_reasons=[]
+checks={'formula_equivalence_max_diff': 2.220446049250313e-16, 'max_masked_leakage': 0.0, 'max_signed_l1': 0.9983598138083813, 'finite_outputs': True, 'finite_gradients': True, 'jacobian_claim': 'sba_jacobian_frobenius_norm <= softmax_jacobian_frobenius_norm', 'jacobian_claim_status': 'falsified', 'sba_jacobian_frobenius_norm': 0.48483186078076224, 'softmax_jacobian_frobenius_norm': 0.38938977465759933}

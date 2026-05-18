@@ -1,0 +1,27 @@
+{
+  "gate": "cpu_math",
+  "valid": true,
+  "failure_reasons": [],
+  "git_revision": "af8da2f",
+  "command": "python experiments\\sba_validation\\run_cpu_math_gate.py",
+  "seed": 20260518,
+  "device": {
+    "type": "cpu"
+  },
+  "formula_variant": "sba-v1-valid-position-sinh-cosh-shared-denominator",
+  "mask_policy": "valid_positions_only_zero_masked_weights",
+  "dtype_policy": "float64_cpu_primary_float32_smoke",
+  "checks": {
+    "formula_equivalence_max_diff": 2.220446049250313e-16,
+    "max_masked_leakage": 0.0,
+    "max_signed_l1": 0.9983598138083813,
+    "finite_outputs": true,
+    "finite_gradients": true,
+    "jacobian_claim": "sba_jacobian_frobenius_norm <= softmax_jacobian_frobenius_norm",
+    "jacobian_claim_status": "falsified",
+    "sba_jacobian_frobenius_norm": 0.48483186078076224,
+    "softmax_jacobian_frobenius_norm": 0.38938977465759933
+  },
+  "peak_vram_mb": null,
+  "log_path": "experiments\\sba_validation\\cpu_math_gate.log"
+}
