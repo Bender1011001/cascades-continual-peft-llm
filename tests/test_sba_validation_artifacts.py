@@ -5,8 +5,10 @@ from experiments.sba_validation.artifact_utils import (
     gate_payload,
     validate_required_fields,
 )
+from experiments.sba_validation.compare_paired_reduced_sba import compare_paired_artifacts
 from experiments.sba_validation.run_cuda_synthetic_gate import CUDA_SYNTHETIC_CASES, build_case_label
 from experiments.sba_validation.run_cpu_math_gate import run_cpu_math_gate
+from experiments.sba_validation.run_paired_reduced_sba import PAIRED_REDUCED_CONFIG, REASONING3_TASKS
 from experiments.sba_validation.run_tiny_model_gate import TINY_MODEL_GATE_COMMAND
 
 
@@ -65,3 +67,45 @@ def test_cuda_synthetic_cases_are_bounded_and_labeled():
 def test_tiny_model_gate_command_uses_sba_patch_and_threshold():
     assert "--enable-sba-patch" in TINY_MODEL_GATE_COMMAND
     assert "--vram-threshold-mb 7500" in TINY_MODEL_GATE_COMMAND
+
+
+def test_paired_reduced_config_is_bounded():
+    assert REASONING3_TASKS == [
+        "data/task0_gsm8k_cot.jsonl",
+        "data/task1_arc_cot.jsonl",
+        "data/task2_csqa_cot.jsonl",
+    ]
+    assert PAIRED_REDUCED_CONFIG["seed"] == 43
+    assert PAIRED_REDUCED_CONFIG["rank"] == 4
+    assert PAIRED_REDUCED_CONFIG["max_length"] == 256
+    assert PAIRED_REDUCED_CONFIG["epochs"] == 2
+    assert PAIRED_REDUCED_CONFIG["vram_threshold_mb"] == 7500.0
+
+
+def test_compare_rejects_mismatched_manifest(tmp_path):
+    root = tmp_path / "paired_reduced"
+    for arm in ["control", "treatment"]:
+        arm_dir = root / arm
+        arm_dir.mkdir(parents=True)
+        (arm_dir / "run_status.json").write_text(
+            '{"status":"completed","seed":43,"git_revision":"abc"}', encoding="utf-8"
+        )
+        (arm_dir / "metrics.json").write_text(
+            '{"avg_acc":0.5,"bwt":0.0,"peak_vram_mb":1000.0,"old_task_deltas":[0.0,0.0]}',
+            encoding="utf-8",
+        )
+        manifest = [{"task_index": 0, "path": "data/task0_gsm8k_cot.jsonl"}]
+        if arm == "treatment":
+            manifest = [{"task_index": 0, "path": "data/task1_arc_cot.jsonl"}]
+        (arm_dir / "task_manifest.json").write_text(__import__("json").dumps(manifest), encoding="utf-8")
+        (arm_dir / "instrumentation.json").write_text(
+            '{"sba_patch":{"patched_module_count":1,"patched_module_names":["model.layers.0.self_attn"]}}',
+            encoding="utf-8",
+        )
+        (arm_dir / "config.json").write_text(
+            '{"seed":43,"rank":4,"max_length":256,"epochs":2,"model_id":"model","git_revision":"abc"}',
+            encoding="utf-8",
+        )
+    result = compare_paired_artifacts(root, fail_invalid=False)
+    assert result["valid"] is False
+    assert "task manifests differ across arms" in result["failures"]

@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: SBA Task 8 tiny patched-model gate code-quality hardening prepared in isolated worktree; CPU-safe verification passed; no GPU/model download/tiny-gate execution occurred; catastrophic forgetting remains unsolved
+status: SBA Task 9 paired reduced validation runner CPU-safe scaffold prepared in isolated worktree; targeted CPU verification passed; no paired training/GPU/model work occurred; catastrophic forgetting remains unsolved
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,14 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — SBA paired reduced validation runner CPU scaffold
+- Added the Task 9 paired reduced validation runner scaffold [`experiments/sba_validation/run_paired_reduced_sba.py`](experiments/sba_validation/run_paired_reduced_sba.py:1) because SBA needs a fresh same-seed reduced-suite control/treatment runner before any permission-gated paired training. The module exposes [`REASONING3_TASKS`](experiments/sba_validation/run_paired_reduced_sba.py:15) and [`PAIRED_REDUCED_CONFIG`](experiments/sba_validation/run_paired_reduced_sba.py:20), writes task/config/status/metrics/instrumentation artifacts, keeps the heavy training import inside [`run_arm()`](experiments/sba_validation/run_paired_reduced_sba.py:45), and inserts the repo root for direct nested script execution.
+- Added the comparison gate [`experiments/sba_validation/compare_paired_reduced_sba.py`](experiments/sba_validation/compare_paired_reduced_sba.py:1) with [`compare_paired_artifacts()`](experiments/sba_validation/compare_paired_reduced_sba.py:27) to require completed control/treatment artifacts, finite metrics, matching manifests/config/git revision, under-threshold VRAM, and active treatment SBA patch evidence before computing BWT/average-accuracy/old-task delta comparisons.
+- Added the general gate artifact validator [`experiments/sba_validation/validate_sba_artifacts.py`](experiments/sba_validation/validate_sba_artifacts.py:1) with [`validate_gate_artifact()`](experiments/sba_validation/validate_sba_artifacts.py:29) for required-field, finite-number, and `valid=true` validation of SBA gate JSON artifacts.
+- Extended [`tests/test_sba_validation_artifacts.py`](tests/test_sba_validation_artifacts.py:1) with CPU-safe Task 9 tests proving the paired reduced constants remain bounded and that mismatched control/treatment task manifests are rejected by the comparison helper.
+- CPU-safe verification passed: `python -m pytest tests\test_sba_validation_artifacts.py -k "paired_reduced_config or mismatched_manifest" -q && python -m py_compile experiments\sba_validation\run_paired_reduced_sba.py experiments\sba_validation\compare_paired_reduced_sba.py experiments\sba_validation\validate_sba_artifacts.py` exited 0; pytest selected 2 tests, deselected 6, and reported `2 passed`; `py_compile` produced no stdout/stderr. The only observed warning was the pre-existing pytest-asyncio default fixture loop-scope deprecation warning.
+- Strict non-goals honored: [`run_paired_reduced_sba.py`](experiments/sba_validation/run_paired_reduced_sba.py:1) was not executed, no paired control/treatment training ran, [`compare_paired_reduced_sba.py`](experiments/sba_validation/compare_paired_reduced_sba.py:1) was not run against real training artifacts, no model weights were loaded or downloaded, no CUDA/GPU work ran, and Task 10+ was not touched.
 
 ### 2026-05-18 — SBA tiny patched-model gate code-quality hardening
 - Fixed the Task 8 code-quality review changes in [`experiments/sba_validation/run_tiny_model_gate.py`](experiments/sba_validation/run_tiny_model_gate.py:1) because importing the command constant from tests must stay CPU-safe and dependency-light while GPU-path failures still need durable artifacts.
