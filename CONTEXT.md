@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: SBA Task 10 reporting packet scaffold prepared in isolated worktree; packet generation and syntax verification passed; no paired training/GPU/model work occurred; catastrophic forgetting remains unsolved
+status: SBA Task 11 CPU verification passed in isolated worktree; bytecode/tests/artifact validation clean after bytecode cleanup; GPU/model/paired gates remain pending explicit approval; catastrophic forgetting remains unsolved
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,15 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — SBA Task 11 CPU verification and gate boundary preservation
+- Completed Task 11 CPU-only verification in the isolated [`sba-validation`](.worktrees/sba-validation) worktree because the reporting scaffold needed a final syntax/test/artifact validation pass before any result-critic or GPU approval decision.
+- Bytecode compilation passed with exit code 0 and no stdout/stderr: `python -m py_compile cascades\math_ops.py cascades\config.py cascades\sba_patch.py train.py experiments\sba_validation\artifact_utils.py experiments\sba_validation\run_cpu_math_gate.py experiments\sba_validation\run_cuda_synthetic_gate.py experiments\sba_validation\run_tiny_model_gate.py experiments\sba_validation\run_paired_reduced_sba.py experiments\sba_validation\compare_paired_reduced_sba.py experiments\sba_validation\validate_sba_artifacts.py experiments\sba_validation\write_result_critic_packet.py`.
+- CPU-only tests passed: `python -m pytest tests\test_math.py tests\test_sba_patch.py tests\test_sba_validation_artifacts.py -q` collected 49 items and reported `49 passed in 0.81s`. The only observed warning was the pre-existing pytest-asyncio default fixture loop-scope deprecation warning.
+- CPU gate artifact validation passed: `python experiments\sba_validation\validate_sba_artifacts.py experiments\sba_validation\cpu_math_gate.json` exited 0 and returned `valid=true`, `failures=[]`, and artifact `experiments\sba_validation\cpu_math_gate.json`.
+- Approval boundary preserved: no CUDA, tiny-model, model-download/load, paired reduced training, larger-suite experiment, or Task 12 execution was run. `experiments\sba_validation\cuda_synthetic_gate.json`, `experiments\sba_validation\tiny_model_gate.json`, and paired reduced outputs were absent, and [`experiments/sba_validation/RESULT_CRITIC_PACKET.md`](experiments/sba_validation/RESULT_CRITIC_PACKET.md:1) records those gates as missing/invalid pending explicit approval.
+- Cleanup performed: bytecode/test commands modified tracked `.pyc` files under `__pycache__`, `cascades\__pycache__`, and `tests\__pycache__`; those unintended bytecode changes were reverted before commit consideration. No `.pyc` changes were committed.
+- Decision: SBA remains default-off and not a catastrophic-forgetting solution claim. Synthetic CUDA, tiny patched-model, paired reduced training, and larger-suite escalation remain blocked pending valid prior gates, result review, and explicit user approval.
 
 ### 2026-05-18 — SBA validation reporting packet scaffold
 - Added the Task 10 reporting README [`experiments/sba_validation/README.md`](experiments/sba_validation/README.md:1) because the SBA validation directory needs a durable gate-order summary before result-critic routing. It records the CPU math, synthetic CUDA, tiny patched-model, paired reduced, and larger-suite escalation order; SBA remains default-off; and larger-suite escalation remains blocked pending result critic review plus explicit user approval.
