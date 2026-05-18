@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: symmetric bipolar attention validation implementation plan written from approved design; next mode should implement the default-off gate scaffold task-by-task; no code tests or GPU jobs were run; catastrophic forgetting remains unsolved
+status: symmetric bipolar attention validation artifact utility foundation added in isolated worktree; next step is Task 3 review, then CPU math gate writer; no GPU jobs were run; catastrophic forgetting remains unsolved
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,12 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — SBA validation artifact utility foundation
+- Added the importable SBA validation package marker at [`experiments/sba_validation/__init__.py`](experiments/sba_validation/__init__.py:1) and reusable gate-artifact helpers in [`experiments/sba_validation/artifact_utils.py`](experiments/sba_validation/artifact_utils.py:1) because subsequent CPU, CUDA, tiny-model, and paired-training gates need consistent JSON payload construction, git revision capture, finite-number scanning, required-field validation, and artifact writing.
+- Added focused CPU tests in [`tests/test_sba_validation_artifacts.py`](tests/test_sba_validation_artifacts.py:1) for nested NaN/Inf path detection, missing required-field reporting, and gate payload invalidation when checks contain non-finite numeric values.
+- RED evidence: `python -m pytest tests\test_sba_validation_artifacts.py -q` failed during collection with `ModuleNotFoundError: No module named 'experiments.sba_validation.artifact_utils'` after adding the package marker and tests. GREEN evidence after implementing [`artifact_utils.py`](experiments/sba_validation/artifact_utils.py:1): `python -m pytest tests\test_sba_validation_artifacts.py -q` passed 3 tests. The only observed warning was the pre-existing pytest-asyncio default fixture loop scope deprecation warning.
+- Scope kept to Task 3 artifact scaffolding and context only; no CUDA, model patching, training runner, GPU workload, larger-suite escalation, or catastrophic-forgetting solution claim was performed.
 
 ### 2026-05-18 — SBA higher-rank ambiguous mask rejection
 - Fixed the remaining Task 2 code-quality review issue in the isolated [`sba-validation`](.worktrees/sba-validation) worktree by making [`_sba_valid_mask()`](cascades/math_ops.py:16) reject lower-rank masks that can be interpreted both as trailing-broadcast masks and batch-aware masks with different explicit reshaped semantics.
