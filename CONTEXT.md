@@ -14,6 +14,12 @@ updated: 2026-05-18
 
 ## Recent Work
 
+### 2026-05-18 — SBA higher-rank ambiguous mask rejection
+- Fixed the remaining Task 2 code-quality review issue in the isolated [`sba-validation`](.worktrees/sba-validation) worktree by making [`_sba_valid_mask()`](cascades/math_ops.py:16) reject lower-rank masks that can be interpreted both as trailing-broadcast masks and batch-aware masks with different explicit reshaped semantics.
+- Added TDD regression coverage in [`tests/test_math.py`](tests/test_math.py:346) for ambiguous `(B,H,Q,K)=(2,2,3,4)` logits plus `(2,3,4)` masks, explicit trailing/head `(1,H,Q,K)` masks, and explicit batch-aware `(B,1,Q,K)` masks.
+- RED evidence: `python -m pytest tests\test_math.py -k "higher_rank or SymmetricBipolarAttention" -q` failed because the new higher-rank ambiguity test did not raise `ValueError`. GREEN evidence after the fix: `python -m pytest tests\test_math.py -k SymmetricBipolarAttention -q` passed 13 tests with 22 deselected, and `python -m pytest tests\test_math.py -q` passed 35 tests. The only observed warning was the pre-existing pytest-asyncio default fixture loop scope deprecation warning.
+- Scope kept to SBA math/test/context files only; no CUDA, model patching, artifact utilities, GPU code, source-checkout edits, or unrelated docs were changed.
+
 ### 2026-05-18 — SBA mask broadcasting code-quality fix
 - Fixed the Task 2 code-quality review issue in the isolated [`sba-validation`](.worktrees/sba-validation) worktree by replacing the prior singleton-at-`-2` mask expansion in [`_sba_valid_mask()`](cascades/math_ops.py:16) with explicit branches for full-shape, query/key, batch/query/key, key-only, and batch/key masks while preserving True-as-valid semantics.
 - Added focused CPU regression tests in [`tests/test_math.py`](tests/test_math.py:264) for `(Q, K) -> (B, H, Q, K)`, `(B, Q, K) -> (B, H, Q, K)`, `(K,)`, and `(B, K)` masks, comparing broadcasted masks against manually expanded masks and checking masked weights stay zero.

@@ -343,6 +343,79 @@ class TestSymmetricBipolarAttention:
         with pytest.raises(ValueError, match=r"ambiguous.*\(Q, K\).*\(B, K\)"):
             sba_optimized_attention(logits, valid_mask)
 
+    def test_higher_rank_ambiguous_head_or_batch_query_key_mask_is_rejected(self):
+        logits = torch.randn(2, 2, 3, 4, dtype=torch.float64)
+        valid_mask = torch.tensor(
+            [
+                [
+                    [True, False, True, True],
+                    [False, True, True, False],
+                    [True, True, False, True],
+                ],
+                [
+                    [False, True, True, True],
+                    [True, True, False, False],
+                    [True, False, True, True],
+                ],
+            ]
+        )
+
+        with pytest.raises(ValueError, match=r"ambiguous.*\(H, Q, K\).*\(B, Q, K\)"):
+            sba_optimized_attention(logits, valid_mask)
+
+    def test_explicit_higher_rank_trailing_head_mask_broadcasts_across_batches(self):
+        generator = torch.Generator().manual_seed(20260521)
+        logits = torch.randn(2, 2, 3, 4, generator=generator, dtype=torch.float64)
+        head_mask = torch.tensor(
+            [
+                [
+                    [True, False, True, True],
+                    [False, True, True, False],
+                    [True, True, False, True],
+                ],
+                [
+                    [False, True, True, True],
+                    [True, True, False, False],
+                    [True, False, True, True],
+                ],
+            ]
+        )
+        explicit_mask = head_mask.reshape(1, 2, 3, 4)
+        expanded_mask = explicit_mask.expand_as(logits)
+
+        explicit_weights = sba_optimized_attention(logits, explicit_mask)
+        expanded_weights = sba_optimized_attention(logits, expanded_mask)
+
+        assert torch.allclose(explicit_weights, expanded_weights, atol=0.0, rtol=0.0)
+        assert torch.all(explicit_weights.masked_select(~expanded_mask) == 0.0)
+
+    def test_explicit_higher_rank_batch_query_key_mask_broadcasts_across_heads(self):
+        generator = torch.Generator().manual_seed(20260522)
+        logits = torch.randn(2, 2, 3, 4, generator=generator, dtype=torch.float64)
+        batch_mask = torch.tensor(
+            [
+                [
+                    [True, False, True, True],
+                    [False, True, True, False],
+                    [True, True, False, True],
+                ],
+                [
+                    [False, True, True, True],
+                    [True, True, False, False],
+                    [True, False, True, True],
+                ],
+            ]
+        )
+        explicit_mask = batch_mask.reshape(2, 1, 3, 4)
+        expanded_mask = explicit_mask.expand_as(logits)
+
+        explicit_weights = sba_optimized_attention(logits, explicit_mask)
+        expanded_weights = sba_optimized_attention(logits, expanded_mask)
+
+        assert torch.allclose(explicit_weights, expanded_weights, atol=0.0, rtol=0.0)
+        assert torch.all(explicit_weights.masked_select(~expanded_mask) == 0.0)
+        assert torch.any(explicit_weights[0].masked_select(~expanded_mask[1]) != 0.0)
+
     def test_safe_masking_and_all_masked_rows(self):
         logits = torch.tensor([[[50.0, -50.0, 0.0], [1.0, 2.0, 3.0]]], dtype=torch.float64)
         valid_mask = torch.tensor([[[True, False, True], [False, False, False]]])

@@ -20,8 +20,8 @@ def _sba_valid_mask(logits: torch.Tensor, valid_mask: torch.Tensor | None = None
     usual trailing-dimension broadcasting, accept common attention mask forms
     that need singleton dimensions inserted after the batch axis, such as
     ``(B, Q, K)`` and ``(B, K)`` for logits shaped ``(B, H, Q, K)``.
-    Ambiguous two-dimensional masks are rejected when they could mean either
-    query/key or batch/key validity.
+    Ambiguous lower-rank masks are rejected when they could mean either
+    trailing-dimension validity or batch-aware validity.
     """
     if valid_mask is None:
         return torch.ones_like(logits, dtype=torch.bool)
@@ -34,6 +34,25 @@ def _sba_valid_mask(logits: torch.Tensor, valid_mask: torch.Tensor | None = None
     if mask_shape == target_shape:
         return mask
 
+    def _is_broadcastable_shape(shape: tuple[int, ...]) -> bool:
+        return len(shape) == len(target_shape) and all(
+            dim == 1 or dim == target_dim for dim, target_dim in zip(shape, target_shape)
+        )
+
+    def _axis_label(axis: int) -> str:
+        if axis == 0:
+            return "B"
+        if axis == logits.dim() - 1:
+            return "K"
+        if axis == logits.dim() - 2:
+            return "Q"
+        if logits.dim() == 4 and axis == 1:
+            return "H"
+        return f"D{axis}"
+
+    def _axis_tuple_label(axes: range | tuple[int, ...]) -> str:
+        return "(" + ", ".join(_axis_label(axis) for axis in axes) + ")"
+
     def _broadcast_with_shape(shape: tuple[int, ...]) -> torch.Tensor:
         return torch.broadcast_to(mask.reshape(shape), target_shape)
 
@@ -43,6 +62,26 @@ def _sba_valid_mask(logits: torch.Tensor, valid_mask: torch.Tensor | None = None
         # Key-only mask: (K,) -> (..., K).
         if mask.dim() == 1 and mask_shape == (key_dim,):
             return _broadcast_with_shape((1,) * (logits.dim() - 1) + mask_shape)
+
+        if mask.dim() < logits.dim() and mask.dim() >= 2 and logits.dim() >= 3:
+            trailing_shape = (1,) * (logits.dim() - mask.dim()) + mask_shape
+            is_trailing_broadcast_mask = _is_broadcastable_shape(trailing_shape)
+            is_batch_aware_mask = (
+                mask_shape[0] == target_shape[0]
+                and mask_shape[1:] == target_shape[-(mask.dim() - 1):]
+            )
+            batch_aware_shape = (mask_shape[0],) + (1,) * (logits.dim() - mask.dim()) + mask_shape[1:]
+
+            if is_trailing_broadcast_mask and is_batch_aware_mask and trailing_shape != batch_aware_shape:
+                trailing_axes = range(logits.dim() - mask.dim(), logits.dim())
+                batch_aware_axes = (0,) + tuple(range(logits.dim() - (mask.dim() - 1), logits.dim()))
+                raise ValueError(
+                    f"ambiguous valid_mask shape {mask_shape} for logits shape {target_shape}: "
+                    f"lower-rank masks can be interpreted as either trailing "
+                    f"{_axis_tuple_label(trailing_axes)} or batch-aware "
+                    f"{_axis_tuple_label(batch_aware_axes)}; pass explicit singleton dimensions "
+                    "or a full-rank mask"
+                )
 
         is_query_key_mask = mask.dim() == 2 and logits.dim() >= 2 and mask_shape == target_shape[-2:]
         is_batch_key_mask = (
