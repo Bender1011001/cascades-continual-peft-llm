@@ -1,6 +1,6 @@
 ---
 project: CASCADES--continual-PEFT-for-Local-LLMs
-status: SBA Task 11 CPU verification passed in isolated worktree; bytecode/tests/artifact validation clean after bytecode cleanup; GPU/model/paired gates remain pending explicit approval; catastrophic forgetting remains unsolved
+status: SBA validation scaffold is implemented default-off with CPU math/tests/artifact validation passed; GPU/model/paired gates, result criticism, and larger-suite escalation remain blocked pending explicit approval
 updated: 2026-05-18
 ---
 
@@ -13,6 +13,13 @@ updated: 2026-05-18
 - **Blocked on**: Promotion, broad-suite escalation, full [`current4`](experiments/cf_cycle_1/run_nullspace_ablation.py:26), v10, Digital Twin, generative subset, broad settings fuzzer, and catastrophic-forgetting solution claims remain blocked. A new GPU run should require a revised single-policy objective plus explicit user approval.
 
 ## Recent Work
+
+### 2026-05-18 — Symmetric Bipolar Attention validation scaffold handoff
+- Implemented the default-off SBA validation scaffold from [`docs/superpowers/plans/2026-05-18-symmetric-bipolar-attention-validation.md`](docs/superpowers/plans/2026-05-18-symmetric-bipolar-attention-validation.md:1) because the approved design requires a staged evidence ladder before any architecture replacement, GPU gate, or larger-suite escalation.
+- CPU evidence is complete for the scaffold boundary: [`experiments/sba_validation/cpu_math_gate.json`](experiments/sba_validation/cpu_math_gate.json:1) is present and valid, CPU tests for [`tests/test_math.py`](tests/test_math.py:1), [`tests/test_sba_patch.py`](tests/test_sba_patch.py:1), and [`tests/test_sba_validation_artifacts.py`](tests/test_sba_validation_artifacts.py:1) passed, and artifact validation passed for the CPU math gate.
+- Synthetic CUDA, tiny patched-model, and paired reduced training gates require explicit GPU approval and remain blocked/unrun. No CUDA workload, model download/load, tiny model gate, paired training, larger-suite experiment, or escalation has been approved by this handoff.
+- SBA remains default-off and is not a catastrophic-forgetting solution claim. The scaffold is an evidence ladder for criticism and approval decisions, not proof of a deployed CASCADES improvement.
+- Larger-suite escalation remains blocked pending result critic review and explicit user approval.
 
 ### 2026-05-18 — SBA Task 11 verification-only record
 - Recorded only the Task 11 verification facts in the isolated [`sba-validation`](.worktrees/sba-validation) worktree. This entry is not a Task 12 result-critic handoff, final context closeout, GPU request, or approval decision.
