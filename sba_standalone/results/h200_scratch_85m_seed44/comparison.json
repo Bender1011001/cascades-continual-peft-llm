@@ -1,0 +1,13 @@
+{
+  "delta_best_val_loss_sba_minus_softmax": -0.007383203133940697,
+  "delta_val_loss_sba_minus_softmax": -0.007860700599849224,
+  "finished_at": "2026-05-19T00:32:39.734087+00:00",
+  "parameter_count": 85544448,
+  "sba_best_val_loss": 0.5997763704508543,
+  "sba_final_val_loss": 0.6144197601824999,
+  "sba_peak_vram_mb": 52740.7333984375,
+  "softmax_best_val_loss": 0.607159573584795,
+  "softmax_final_val_loss": 0.6222804607823491,
+  "softmax_peak_vram_mb": 14558.626953125,
+  "valid": true
+}

@@ -1,0 +1,8 @@
+{
+  "current_vram_mb": 1850.6513671875,
+  "epoch": 1,
+  "last_loss": 1.0959506034851074,
+  "micro_steps": 288,
+  "optimizer_steps": 36,
+  "peak_vram_mb": 2853.85595703125
+}

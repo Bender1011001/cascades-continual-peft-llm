@@ -1,0 +1,17 @@
+{
+  "attention": "sba",
+  "batch_size": 64,
+  "best_val_loss_seen": 0.5992588046938181,
+  "block_size": 512,
+  "elapsed_seconds": 335.81719043600606,
+  "final_val_loss": 0.611849251203239,
+  "final_val_perplexity": 1.8438379675902519,
+  "finished_at": "2026-05-19T00:22:13.086670+00:00",
+  "last_train_loss": 0.7738348841667175,
+  "parameter_count": 85544448,
+  "peak_vram_mb": 52740.7333984375,
+  "steps": 800,
+  "train_tokens": 1718931532,
+  "val_tokens": 149472308,
+  "valid": true
+}

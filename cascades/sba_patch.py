@@ -52,21 +52,48 @@ def _normalize_attention_mask(attention_mask, logits: torch.Tensor) -> torch.Ten
 def _install_sba_forward(module: nn.Module) -> None:
     original_forward = module.forward
 
-    def sba_forward(self, hidden_states, attention_mask=None, output_attentions=False, **kwargs):
+    def sba_forward(self, hidden_states, *args, attention_mask=None, output_attentions=False, **kwargs):
         batch, query_len, _ = hidden_states.shape
-        query = self.q_proj(hidden_states)
-        key = self.k_proj(hidden_states)
-        value = self.v_proj(hidden_states)
-        num_heads = int(getattr(self, "num_heads", 1))
-        head_dim = int(getattr(self, "head_dim", query.shape[-1] // num_heads))
-        query = query.view(batch, query_len, num_heads, head_dim).transpose(1, 2)
-        key = key.view(batch, query_len, num_heads, head_dim).transpose(1, 2)
-        value = value.view(batch, query_len, num_heads, head_dim).transpose(1, 2)
+        input_shape = hidden_states.shape[:-1]
+        head_dim = int(getattr(self, "head_dim", 0))
+        if head_dim <= 0:
+            head_dim = int(getattr(self, "hidden_size", hidden_states.shape[-1])) // int(getattr(self, "num_heads", 1))
+        query = self.q_proj(hidden_states).view(*input_shape, -1, head_dim)
+        key = self.k_proj(hidden_states).view(*input_shape, -1, head_dim)
+        value = self.v_proj(hidden_states).view(*input_shape, -1, head_dim)
+        if hasattr(self, "q_norm"):
+            query = self.q_norm(query)
+        if hasattr(self, "k_norm"):
+            key = self.k_norm(key)
+        query = query.transpose(1, 2)
+        key = key.transpose(1, 2)
+        value = value.transpose(1, 2)
+        position_embeddings = args[0] if args and isinstance(args[0], tuple) else kwargs.get("position_embeddings")
+        if position_embeddings is not None:
+            cos, sin = position_embeddings
+            try:
+                from transformers.models.qwen3.modeling_qwen3 import apply_rotary_pos_emb
+            except Exception:
+                from transformers.models.qwen2.modeling_qwen2 import apply_rotary_pos_emb
+            query, key = apply_rotary_pos_emb(query, key, cos, sin)
+        past_key_values = kwargs.get("past_key_values")
+        if past_key_values is None:
+            past_key_values = kwargs.get("past_key_value")
+        if past_key_values is not None:
+            key, value = past_key_values.update(key, value, self.layer_idx)
+        if key.shape[1] != query.shape[1]:
+            repeat_factor = query.shape[1] // key.shape[1]
+            key = key.repeat_interleave(repeat_factor, dim=1)
+            value = value.repeat_interleave(repeat_factor, dim=1)
+        if attention_mask is None and len(args) >= 2 and torch.is_tensor(args[1]):
+            attention_mask = args[1]
         logits = torch.matmul(query, key.transpose(-1, -2)) / math.sqrt(head_dim)
         valid_mask = _normalize_attention_mask(attention_mask, logits)
         weights, attended = sba_value_attention(logits, value, valid_mask)
-        attended = attended.transpose(1, 2).contiguous().view(batch, query_len, num_heads * head_dim)
+        attended = attended.transpose(1, 2).contiguous().reshape(batch, query_len, -1)
         output = self.o_proj(attended)
+        if _module_class_name(self) in DEFAULT_SUPPORTED_ATTENTION_CLASS_NAMES:
+            return output, weights if output_attentions else None
         return output, weights if output_attentions else None, None
 
     setattr(module, "sba_original_forward", original_forward)

@@ -1,0 +1,24 @@
+{
+  "batch_size": 1,
+  "data_files": [
+    "data/task0_logic_cot.jsonl",
+    "data/task1_decomp_cot.jsonl",
+    "data/task2_action_cot.jsonl"
+  ],
+  "epochs": 2,
+  "eval_limit_per_file": 48,
+  "git_revision": "6da3d1e",
+  "grad_accum_steps": 8,
+  "gradient_checkpointing": true,
+  "load_in_4bit": true,
+  "lora_alpha": 32,
+  "lora_rank": 16,
+  "lora_targets": "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj",
+  "lr": 0.0002,
+  "max_length": 256,
+  "model_id": "Qwen/Qwen2.5-1.5B",
+  "seed": 43,
+  "started_at": "2026-05-18T23:17:01.621095+00:00",
+  "train_limit_per_file": 96,
+  "vram_threshold_mb": 7900.0
+}

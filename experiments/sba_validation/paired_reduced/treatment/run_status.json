@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "reason": "peak VRAM 7587 MB exceeded threshold 7500 MB at task=0 epoch=1 batch=2",
+  "seed": 43,
+  "git_revision": "6da3d1e"
+}

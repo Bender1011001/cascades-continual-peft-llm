@@ -1,0 +1,58 @@
+{
+  "rows": [
+    {
+      "case": "experiments\\sba_validation\\paired_reduced_short128",
+      "seed": 43,
+      "max_length": 128,
+      "control_avg_pct": 7.941992989785625,
+      "treatment_avg_pct": 59.995821607232116,
+      "delta_avg_points": 52.053828617446484,
+      "control_bwt_pct": 0.6438967050877351,
+      "treatment_bwt_pct": 3.9499923637457135,
+      "delta_bwt_points": 3.306095658657979,
+      "continue": true
+    },
+    {
+      "case": "experiments\\sba_validation\\local_gpu_sweep\\short128_seed44",
+      "seed": 44,
+      "max_length": 128,
+      "control_avg_pct": 7.646382223893067,
+      "treatment_avg_pct": 54.40961579943651,
+      "delta_avg_points": 46.76323357554344,
+      "control_bwt_pct": 0.8288270808505274,
+      "treatment_bwt_pct": 3.0771836699506894,
+      "delta_bwt_points": 2.2483565891001622,
+      "continue": true
+    },
+    {
+      "case": "experiments\\sba_validation\\local_gpu_sweep\\short192_seed43",
+      "seed": 43,
+      "max_length": 192,
+      "control_avg_pct": 26.67149472603902,
+      "treatment_avg_pct": 60.233578853559365,
+      "delta_avg_points": 33.56208412752035,
+      "control_bwt_pct": 4.1157665460604385,
+      "treatment_bwt_pct": 3.530278882708915,
+      "delta_bwt_points": -0.5854876633515236,
+      "continue": false
+    },
+    {
+      "case": "experiments\\sba_validation\\local_gpu_sweep\\short128_seed45",
+      "seed": 45,
+      "max_length": 128,
+      "control_avg_pct": 6.993002684494787,
+      "treatment_avg_pct": 59.04479834634947,
+      "delta_avg_points": 52.05179566185468,
+      "control_bwt_pct": 0.5073785479615521,
+      "treatment_bwt_pct": 3.76440431448922,
+      "delta_bwt_points": 3.257025766527667,
+      "continue": true
+    }
+  ],
+  "short128_mean_delta_avg_points": 50.2896192849482,
+  "short128_mean_delta_bwt_points": 2.9371593380952694,
+  "all_mean_delta_avg_points": 46.10773549559124,
+  "all_mean_delta_bwt_points": 2.0564975877335714,
+  "continue_count": 3,
+  "case_count": 4
+}

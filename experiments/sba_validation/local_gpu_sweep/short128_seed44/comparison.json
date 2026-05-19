@@ -1,0 +1,15 @@
+{
+  "valid": true,
+  "failures": [],
+  "delta_bwt_points": 2.2483565891001622,
+  "delta_avg_acc_points": 46.76323357554344,
+  "old_task_delta_gaps_points": [
+    1.754012053820575,
+    2.742701124379749
+  ],
+  "control_peak_vram_mb": 5197.65869140625,
+  "treatment_peak_vram_mb": 5436.88037109375,
+  "vram_threshold_mb": 7500.0,
+  "sba_patch_active": true,
+  "continue": true
+}

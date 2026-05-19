@@ -31,6 +31,15 @@ PAIRED_REDUCED_CONFIG = {
 }
 
 
+def paired_config_from_args(args: argparse.Namespace) -> dict[str, object]:
+    config = dict(PAIRED_REDUCED_CONFIG)
+    for key in ("seed", "rank", "max_length", "epochs", "vram_threshold_mb"):
+        value = getattr(args, key)
+        if value is not None:
+            config[key] = value
+    return config
+
+
 def apply_reasoning3_manifest() -> list[str]:
     data.TASK_FILES = list(REASONING3_TASKS)
     data.TASK_NAMES = {i: f"Task {i} ({Path(path).stem})" for i, path in enumerate(REASONING3_TASKS)}
@@ -53,9 +62,10 @@ def task_manifest() -> list[dict[str, object]]:
     return rows
 
 
-def run_arm(arm: str, output_root: Path, enable_sba_patch: bool) -> None:
+def run_arm(arm: str, output_root: Path, enable_sba_patch: bool, config: dict[str, object] | None = None) -> None:
     import train
 
+    run_config = dict(PAIRED_REDUCED_CONFIG if config is None else config)
     apply_reasoning3_manifest()
     train.NUM_TASKS = len(REASONING3_TASKS)
     arm_dir = output_root / arm
@@ -63,23 +73,23 @@ def run_arm(arm: str, output_root: Path, enable_sba_patch: bool) -> None:
         shutil.rmtree(arm_dir)
     arm_dir.mkdir(parents=True)
     write_json(arm_dir / "task_manifest.json", task_manifest())
-    config = dict(PAIRED_REDUCED_CONFIG)
-    config.update({"arm": arm, "enable_sba_patch": enable_sba_patch, "git_revision": git_revision()})
-    write_json(arm_dir / "config.json", config)
+    artifact_config = dict(run_config)
+    artifact_config.update({"arm": arm, "enable_sba_patch": enable_sba_patch, "git_revision": git_revision()})
+    write_json(arm_dir / "config.json", artifact_config)
     patch_report_path = arm_dir / "sba_patch_report.json"
     status = "completed"
     reason = None
     try:
         matrix = train.train_cascades(
-            seed=PAIRED_REDUCED_CONFIG["seed"],
-            model_id=PAIRED_REDUCED_CONFIG["model_id"],
+            seed=int(run_config["seed"]),
+            model_id=str(run_config["model_id"]),
             output_prefix=str(arm_dir / "cascades"),
-            epochs=PAIRED_REDUCED_CONFIG["epochs"],
-            rank=PAIRED_REDUCED_CONFIG["rank"],
-            max_length=PAIRED_REDUCED_CONFIG["max_length"],
+            epochs=int(run_config["epochs"]),
+            rank=int(run_config["rank"]),
+            max_length=int(run_config["max_length"]),
             enable_sleep=True,
             abort_on_nonfinite=True,
-            vram_threshold_mb=PAIRED_REDUCED_CONFIG["vram_threshold_mb"],
+            vram_threshold_mb=float(run_config["vram_threshold_mb"]),
             enable_sba_patch=enable_sba_patch,
             sba_patch_report_path=str(patch_report_path) if enable_sba_patch else None,
         )
@@ -102,10 +112,10 @@ def run_arm(arm: str, output_root: Path, enable_sba_patch: bool) -> None:
                 if __import__("torch").cuda.is_available()
                 else 0.0
             ),
-            "seed": PAIRED_REDUCED_CONFIG["seed"],
-            "rank": PAIRED_REDUCED_CONFIG["rank"],
-            "max_length": PAIRED_REDUCED_CONFIG["max_length"],
-            "epochs": PAIRED_REDUCED_CONFIG["epochs"],
+            "seed": int(run_config["seed"]),
+            "rank": int(run_config["rank"]),
+            "max_length": int(run_config["max_length"]),
+            "epochs": int(run_config["epochs"]),
             "git_revision": git_revision(),
         }
         write_json(arm_dir / "metrics.json", metrics)
@@ -117,7 +127,7 @@ def run_arm(arm: str, output_root: Path, enable_sba_patch: bool) -> None:
     write_json(arm_dir / "instrumentation.json", {"sba_patch": sba_patch})
     write_json(
         arm_dir / "run_status.json",
-        {"status": status, "reason": reason, "seed": PAIRED_REDUCED_CONFIG["seed"], "git_revision": git_revision()},
+        {"status": status, "reason": reason, "seed": int(run_config["seed"]), "git_revision": git_revision()},
     )
     if status != "completed":
         raise SystemExit(2)
@@ -127,8 +137,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run paired reduced SBA validation")
     parser.add_argument("--arm", choices=["control", "treatment"], required=True)
     parser.add_argument("--output-root", default="experiments/sba_validation/paired_reduced")
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--rank", type=int, default=None)
+    parser.add_argument("--max-length", type=int, default=None)
+    parser.add_argument("--epochs", type=int, default=None)
+    parser.add_argument("--vram-threshold-mb", type=float, default=None)
     args = parser.parse_args()
-    run_arm(args.arm, ROOT / args.output_root, enable_sba_patch=args.arm == "treatment")
+    run_arm(
+        args.arm,
+        ROOT / args.output_root,
+        enable_sba_patch=args.arm == "treatment",
+        config=paired_config_from_args(args),
+    )
     print(f"SBA paired reduced {args.arm} completed")
 
 

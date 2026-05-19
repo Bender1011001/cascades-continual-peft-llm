@@ -1,0 +1,15 @@
+{
+  "arm": "treatment",
+  "avg_acc": 0.5904479834634947,
+  "bwt": 0.0376440431448922,
+  "old_task_deltas": [
+    0.04800876282047012,
+    0.027279323469314276
+  ],
+  "peak_vram_mb": 5383.07763671875,
+  "seed": 45,
+  "rank": 4,
+  "max_length": 128,
+  "epochs": 2,
+  "git_revision": "6da3d1e"
+}

@@ -1,0 +1,27 @@
+{
+  "arm": "baseline",
+  "base_model_only_input": true,
+  "elapsed_seconds": 575.9518034999492,
+  "enable_sba": false,
+  "eval": {
+    "batches": 144.0,
+    "loss": 1.2005030814972188,
+    "proxy_accuracy": 0.3010427247854999
+  },
+  "finished_at": "2026-05-18T23:26:37.583455+00:00",
+  "micro_steps": 576,
+  "model_id": "Qwen/Qwen2.5-1.5B",
+  "optimizer_steps": 72,
+  "patch_report": {
+    "formula_variant": "sba-v1-standalone-valid-position-sinh-cosh-shared-denominator",
+    "patched_module_count": 0,
+    "patched_module_names": [],
+    "requested": false
+  },
+  "peak_vram_mb": 2853.916015625,
+  "status": "completed",
+  "train_loss_first": 2.374237537384033,
+  "train_loss_last": 1.1129070520401,
+  "train_loss_mean": 1.166958888404123,
+  "valid": true
+}

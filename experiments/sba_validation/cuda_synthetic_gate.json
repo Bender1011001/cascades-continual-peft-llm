@@ -1,0 +1,74 @@
+{
+  "gate": "cuda_synthetic",
+  "valid": true,
+  "failure_reasons": [],
+  "git_revision": "6da3d1e",
+  "command": "python experiments\\sba_validation\\run_cuda_synthetic_gate.py --vram-threshold-mb 7500",
+  "seed": 20260518,
+  "device": {
+    "type": "cuda",
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4060 Ti"
+  },
+  "formula_variant": "sba-v1-valid-position-sinh-cosh-shared-denominator",
+  "mask_policy": "valid_positions_only_zero_masked_weights",
+  "dtype_policy": "float32_and_float16_cuda",
+  "checks": {
+    "cases": [
+      {
+        "label": "b1_h2_q16_k16_d32_float32_mask0.00",
+        "shape": [
+          1,
+          2,
+          16,
+          16
+        ],
+        "dtype": "float32",
+        "mask_density": 0.0,
+        "forward_finite": true,
+        "backward_finite": true,
+        "max_signed_l1": 0.839485764503479,
+        "max_masked_leakage": 0.0,
+        "elapsed_ms": 136.63239998277277,
+        "peak_vram_mb": 0.02783203125
+      },
+      {
+        "label": "b1_h2_q32_k32_d64_float32_mask0.25",
+        "shape": [
+          1,
+          2,
+          32,
+          32
+        ],
+        "dtype": "float32",
+        "mask_density": 0.25,
+        "forward_finite": true,
+        "backward_finite": true,
+        "max_signed_l1": 0.8206478357315063,
+        "max_masked_leakage": 0.0,
+        "elapsed_ms": 1.2744999257847667,
+        "peak_vram_mb": 0.10693359375
+      },
+      {
+        "label": "b1_h4_q64_k64_d64_float16_mask0.50",
+        "shape": [
+          1,
+          4,
+          64,
+          64
+        ],
+        "dtype": "float16",
+        "mask_density": 0.5,
+        "forward_finite": true,
+        "backward_finite": true,
+        "max_signed_l1": 0.8248844146728516,
+        "max_masked_leakage": 0.0,
+        "elapsed_ms": 16.69339998625219,
+        "peak_vram_mb": 0.49267578125
+      }
+    ],
+    "vram_threshold_mb": 7500.0
+  },
+  "peak_vram_mb": 0.49267578125,
+  "log_path": "experiments\\sba_validation\\cuda_synthetic_gate.log"
+}

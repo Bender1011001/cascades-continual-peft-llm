@@ -1,0 +1,16 @@
+{
+  "valid": true,
+  "failure_reasons": [],
+  "model_id": "p-e-w/Qwen3-4B-Instruct-2507-heretic",
+  "task_suite": "reasoning3",
+  "seed": 43,
+  "max_length": 128,
+  "task_accs": [
+    1.2957760829306057e-06,
+    2.238632150311288e-07,
+    1.5293165997389938e-06
+  ],
+  "avg_acc": 1.0163186325669094e-06,
+  "peak_vram_mb": 2820.8486328125,
+  "git_revision": "6da3d1e"
+}

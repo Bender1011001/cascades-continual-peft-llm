@@ -1,0 +1,17 @@
+{
+  "attention": "softmax",
+  "batch_size": 64,
+  "best_val_loss_seen": 0.5827409401535988,
+  "block_size": 512,
+  "elapsed_seconds": 65.89566521499364,
+  "final_val_loss": 0.6068891827017069,
+  "final_val_perplexity": 1.8347150488200046,
+  "finished_at": "2026-05-19T00:16:36.146998+00:00",
+  "last_train_loss": 0.7733175754547119,
+  "parameter_count": 85544448,
+  "peak_vram_mb": 14558.626953125,
+  "steps": 800,
+  "train_tokens": 1718931532,
+  "val_tokens": 149472308,
+  "valid": true
+}

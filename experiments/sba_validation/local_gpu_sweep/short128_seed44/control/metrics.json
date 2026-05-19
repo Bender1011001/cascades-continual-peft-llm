@@ -1,0 +1,15 @@
+{
+  "arm": "control",
+  "avg_acc": 0.07646382223893067,
+  "bwt": 0.008288270808505274,
+  "old_task_deltas": [
+    0.01649682771992278,
+    7.971389708776727e-05
+  ],
+  "peak_vram_mb": 5197.65869140625,
+  "seed": 44,
+  "rank": 4,
+  "max_length": 128,
+  "epochs": 2,
+  "git_revision": "6da3d1e"
+}

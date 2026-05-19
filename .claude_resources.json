@@ -1,0 +1,39 @@
+﻿{
+    "timestamp":  "2026-05-18T12:23:26.5919252-07:00",
+    "os":  {
+               "system":  "Windows",
+               "caption":  "Microsoft Windows 11 Pro",
+               "version":  "10.0.22631"
+           },
+    "cpu":  {
+                "name":  "13th Gen Intel(R) Core(TM) i5-13600K",
+                "logical_cores":  20,
+                "physical_cores":  14
+            },
+    "memory":  {
+                   "total_gb":  63.82,
+                   "available_gb":  26.9,
+                   "percent_used":  57.9
+               },
+    "disk":  {
+                 "drive":  "E:",
+                 "total_gb":  11175.99,
+                 "available_gb":  482.88,
+                 "percent_used":  95.7
+             },
+    "gpu":  {
+                "nvidia_gpus":  [
+                                    {
+                                        "name":  "NVIDIA GeForce RTX 4060 Ti",
+                                        "memory_total_mb":  8188,
+                                        "memory_free_mb":  551,
+                                        "driver_version":  "591.86"
+                                    }
+                                ],
+                "total_gpus":  1,
+                "cuda_available":  true
+            },
+    "recommendations":  {
+                            "gpu_testing":  "Run synthetic CUDA gate first, then tiny patched-model gate with 4-bit quantization and 7500 MB VRAM cap"
+                        }
+}

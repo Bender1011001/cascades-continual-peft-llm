@@ -1,0 +1,43 @@
+{
+  "formula_variant": "sba-v1-standalone-valid-position-sinh-cosh-shared-denominator",
+  "patched_module_count": 28,
+  "patched_module_names": [
+    "base_model.model.model.layers.0.self_attn",
+    "base_model.model.model.layers.1.self_attn",
+    "base_model.model.model.layers.2.self_attn",
+    "base_model.model.model.layers.3.self_attn",
+    "base_model.model.model.layers.4.self_attn",
+    "base_model.model.model.layers.5.self_attn",
+    "base_model.model.model.layers.6.self_attn",
+    "base_model.model.model.layers.7.self_attn",
+    "base_model.model.model.layers.8.self_attn",
+    "base_model.model.model.layers.9.self_attn",
+    "base_model.model.model.layers.10.self_attn",
+    "base_model.model.model.layers.11.self_attn",
+    "base_model.model.model.layers.12.self_attn",
+    "base_model.model.model.layers.13.self_attn",
+    "base_model.model.model.layers.14.self_attn",
+    "base_model.model.model.layers.15.self_attn",
+    "base_model.model.model.layers.16.self_attn",
+    "base_model.model.model.layers.17.self_attn",
+    "base_model.model.model.layers.18.self_attn",
+    "base_model.model.model.layers.19.self_attn",
+    "base_model.model.model.layers.20.self_attn",
+    "base_model.model.model.layers.21.self_attn",
+    "base_model.model.model.layers.22.self_attn",
+    "base_model.model.model.layers.23.self_attn",
+    "base_model.model.model.layers.24.self_attn",
+    "base_model.model.model.layers.25.self_attn",
+    "base_model.model.model.layers.26.self_attn",
+    "base_model.model.model.layers.27.self_attn"
+  ],
+  "requested": true,
+  "supported_class_names": [
+    "LlamaAttention",
+    "LlamaSdpaAttention",
+    "Qwen2Attention",
+    "Qwen2SdpaAttention",
+    "Qwen3Attention",
+    "Qwen3SdpaAttention"
+  ]
+}

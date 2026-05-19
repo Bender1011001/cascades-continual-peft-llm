@@ -1,0 +1,14 @@
+{
+  "base_model_only_input": true,
+  "baseline_peak_vram_mb": 2853.916015625,
+  "baseline_proxy_accuracy": 0.3010427247854999,
+  "delta_proxy_accuracy": -0.15700453528874475,
+  "delta_proxy_accuracy_points": -15.700453528874474,
+  "finished_at": "2026-05-18T23:35:40.693246+00:00",
+  "git_revision": "6da3d1e",
+  "model_id": "Qwen/Qwen2.5-1.5B",
+  "sba_patched_module_count": 28,
+  "sba_peak_vram_mb": 3510.98291015625,
+  "sba_proxy_accuracy": 0.14403818949675518,
+  "valid": true
+}

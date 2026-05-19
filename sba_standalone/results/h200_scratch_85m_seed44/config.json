@@ -1,0 +1,51 @@
+{
+  "amp_dtype": "torch.bfloat16",
+  "args": {
+    "arms": "both",
+    "batch_size": 64,
+    "block_size": 512,
+    "data_files": [
+      "data/task0_gsm8k_cot.jsonl",
+      "data/task0_logic_cot.jsonl",
+      "data/task1_arc_cot.jsonl",
+      "data/task1_decomp_cot.jsonl",
+      "data/task2_action_cot.jsonl",
+      "data/task2_csqa_cot.jsonl",
+      "data/task3_digital_twin.jsonl"
+    ],
+    "data_repeat": 64,
+    "dropout": 0.0,
+    "dtype": "bf16",
+    "eval_batch_size": 64,
+    "eval_iters": 16,
+    "grad_accum_steps": 1,
+    "grad_clip": 1.0,
+    "log_every": 100,
+    "lr": 0.0003,
+    "n_embd": 768,
+    "n_head": 12,
+    "n_layer": 12,
+    "output_dir": "sba_standalone/results/h200_scratch_85m_seed44",
+    "seed": 44,
+    "steps": 800,
+    "val_fraction": 0.08,
+    "weight_decay": 0.1
+  },
+  "cuda_device": "NVIDIA H200",
+  "git_revision": null,
+  "scratch_config": {
+    "block_size": 512,
+    "dropout": 0.0,
+    "mlp_ratio": 4,
+    "n_embd": 768,
+    "n_head": 12,
+    "n_layer": 12,
+    "vocab_size": 257
+  },
+  "script": "run_scratch_compare.py",
+  "started_at": "2026-05-19T00:26:17.507821+00:00",
+  "text_count": 1066,
+  "total_tokens": 1868403840,
+  "train_tokens": 1718931532,
+  "val_tokens": 149472308
+}
