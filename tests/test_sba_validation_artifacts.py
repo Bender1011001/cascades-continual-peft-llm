@@ -1,6 +1,4 @@
 import math
-from argparse import Namespace
-from pathlib import Path
 
 from experiments.sba_validation.artifact_utils import (
     collect_nonfinite_paths,
@@ -12,7 +10,10 @@ from experiments.sba_validation.run_cuda_synthetic_gate import CUDA_SYNTHETIC_CA
 from experiments.sba_validation.run_cpu_math_gate import run_cpu_math_gate
 from experiments.sba_validation.run_paired_reduced_sba import PAIRED_REDUCED_CONFIG, REASONING3_TASKS
 from experiments.sba_validation.run_tiny_model_gate import TINY_MODEL_GATE_COMMAND
-from sba_standalone.run_scratch_compare import ScratchConfig, checkpoint_path_for_step, should_save_checkpoint
+
+# NOTE: Tests of the standalone SBA modules (benchmark_sba_implementations,
+# run_scratch_compare) moved to the symmetric-bipolar-attention repo when SBA
+# was split out. See test_sba_standalone_units.py there.
 
 
 def test_collect_nonfinite_paths_finds_nested_nan_and_inf():
@@ -112,19 +113,3 @@ def test_compare_rejects_mismatched_manifest(tmp_path):
     result = compare_paired_artifacts(root, fail_invalid=False)
     assert result["valid"] is False
     assert "task manifests differ across arms" in result["failures"]
-
-
-def test_scratch_checkpoint_policy_saves_final_and_interval_steps(tmp_path):
-    args = Namespace(save_checkpoints=True, checkpoint_every=100)
-    assert should_save_checkpoint(step=1, final_step=250, args=args) is False
-    assert should_save_checkpoint(step=100, final_step=250, args=args) is True
-    assert should_save_checkpoint(step=250, final_step=250, args=args) is True
-
-    disabled = Namespace(save_checkpoints=False, checkpoint_every=100)
-    assert should_save_checkpoint(step=250, final_step=250, args=disabled) is False
-
-
-def test_scratch_checkpoint_path_records_attention_and_step(tmp_path):
-    config = ScratchConfig(block_size=128, n_layer=2, n_head=4, n_embd=128)
-    path = checkpoint_path_for_step(Path(tmp_path), "sba", step=400, config=config)
-    assert path == Path(tmp_path) / "sba" / "checkpoints" / "sba_step000400_2l_4h_128d.pt"
