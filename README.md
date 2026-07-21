@@ -27,7 +27,7 @@ Standard fine-tuning (LoRA) destroys the reasoning architecture of abliterated m
 
 ```bash
 # Clone and install
-git clone https://github.com/your-org/CASCADES--continual-PEFT-for-Local-LLMs.git
+git clone https://github.com/Bender1011001/CASCADES--continual-PEFT-for-Local-LLMs.git
 cd CASCADES--continual-PEFT-for-Local-LLMs
 pip install -e ".[dev]"
 ```
