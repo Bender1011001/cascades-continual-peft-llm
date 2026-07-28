@@ -54,7 +54,7 @@ python train.py \
 ### Run Tests
 
 ```bash
-pytest                    # 129 tests, all CPU-only
+pytest                    # 187 tests, all CPU-only
 pytest tests/ -v --tb=short
 ```
 
