@@ -48,3 +48,13 @@ Thumbs.db
 
 # Torrents / downloads
 *.torrent
+
+# Third-party CTF / challenge binaries (not ours to redistribute)
+*.exe
+experiments/flareon12/
+
+# Bulk generated datasets and caches (too large for git; rebuild with the
+# build_*.py scripts). The small task*.jsonl suites ARE tracked on purpose.
+data/open_reason_code_mix_*.jsonl
+*_tac_cache.npz
+*.npz
