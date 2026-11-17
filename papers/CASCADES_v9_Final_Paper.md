@@ -1,3 +1,5 @@
+> **Historical research draft — interpretation correction (2026-11-16).** This document retains earlier claims and measurements, including stronger language than the available evaluation supports. Its `exp(-loss)` metric is a loss-based proxy, not reasoning-task accuracy. The reported 0.00% exact-match result does not establish successful reasoning transfer, and the draft does not prove state-of-the-art performance, a general solution to forgetting, or a mathematical guarantee. Its 46.82% / +0.82% row differs from the README's 35.91% / -1.46% row; these must not be treated as the same experiment without matching run artifacts. See the current [README](../README.md) for scope and limitations.
+
 # CASCADES: The Cognitive Ecosystem — Autopoietic and Elastic Subspace Continual Learning
 
 ## Abstract

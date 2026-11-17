@@ -1,14 +1,14 @@
-# CASCADES (v9 Pro): The Cognitive Ecosystem
+# CASCADES: Experimental Continual PEFT
 
-**Mathematically Secure Continual Learning for Abliterated LLMs under 8GB Constraints.**
+**Research code for parameter-efficient continual adaptation under an 8GB GPU budget.**
 
-CASCADES is an _Autopoietic Cognitive Ecosystem_ designed to adapt fragile, abliterated ("Heretic") models continuously with significantly reduced forgetting compared to standard fine-tuning methods.
+CASCADES explores constrained adapter updates and dynamic allocation for sequential training of language models. Its effectiveness depends on the model, data, and configuration. It does not establish a general solution to forgetting or a mathematical guarantee of preserved reasoning ability.
 
-## 🏆 The 4B Heretic Breakthrough
+## Reported local experiments
 
-Standard fine-tuning (LoRA) destroys the reasoning architecture of abliterated models. CASCADES solves this by constraining updates to Autopoietic Stiefel Manifolds and training on pure zero-shot reasoning tasks.
+The figures below are historical local measurements. **The reported accuracy metric is `exp(-loss)`, a loss-based proxy, not the percentage of reasoning questions answered correctly.** The rows use different model variants and are not a controlled comparison of algorithm quality. See the limitations before drawing conclusions.
 
-| Method              | Model                | Avg ACC    | BWT        | VRAM      |
+| Method              | Model                | Loss proxy | BWT        | VRAM      |
 | :------------------ | :------------------- | :--------- | :--------- | :-------- |
 | Budget-Matched LoRA | Qwen3-4B             | ~11.5%     | -28.4%     | ~7.8GB    |
 | Standard LoRA       | Qwen3-8B Heretic     | 25.84%     | -12.18%    | 7.8GB     |
@@ -16,10 +16,10 @@ Standard fine-tuning (LoRA) destroys the reasoning architecture of abliterated m
 
 ### Key Results
 
-- **Avg Reasoning Accuracy**: 35.91% across 3 zero-shot reasoning task streams (495 examples).
+- **Loss-based proxy**: reported `exp(-loss) = 0.3591` across 3 reasoning task streams (495 examples); this is not 35.91% answer accuracy.
 - **Reduced Forgetting**: -1.46% BWT in best observed run (v9 Pro, seed 42). BWT varies across configurations — see Limitations.
 - **Hardware**: Benchmarked on a single RTX 4060 Ti (8GB VRAM, 5.2GB used).
-- **Speed**: 2.4x throughput increase via D-MoLE dynamic expert routing.
+- **Throughput**: the historical paper reports a 2.4x figure. A matched, independently reproduced throughput comparison is not established by the evidence summarized here.
 
 ## 🚀 Quick Start
 
@@ -32,10 +32,12 @@ cd cascades-continual-peft-llm
 pip install -e ".[dev]"
 ```
 
-### Reproduce the Breakthrough
+### Run a short training experiment
+
+The default script uses 10 gradient steps per task, compared with 200 described for the paper run. It exercises the pipeline; it does not reproduce the full reported experiment or guarantee its results.
 
 ```bash
-# Lightning reproduction (approx. 5 mins, 8GB GPU)
+# Short experiment; requires an 8GB-class CUDA GPU
 python reproduce_the_breakthrough.py
 ```
 
@@ -169,8 +171,8 @@ Details on the **Transpose Parity Bug** fix (R^⊤ mixing) and the **GQA Scaling
 ## ⚠️ Limitations
 
 - **Forgetting Variance**: The reported -1.46% BWT is from the best v9 Pro run. Across 7 saved runs, BWT ranges from +2.42% to -32.96%. Several v10 configurations show BWT worse than -10%, indicating that anti-forgetting performance is sensitive to model variant, data distribution, and hyperparameters. All BWT values are computed on proxy accuracy (`exp(-loss)`), not generative exact match.
-- **Exact Match**: While proxy accuracy reaches 35.91%, generative exact match rates require the structured evaluation pipeline (`--eval_em`)
-- **GQA Scaling Paradox**: Performance plateaus at 8B (32.97%) compared to 4B breakthrough — see Section 7 of the paper
+- **Exact Match**: Loss-based proxy values do not establish answer correctness. Measure generative exact match separately with the structured evaluation pipeline (`--eval_em`). The historical paper reports 0.00% exact match for one unconstrained evaluation; do not substitute its proxy score for task accuracy.
+- **GQA Scaling Paradox**: Performance plateaus at 8B (32.97%) compared to reported 4B run — see Section 7 of the paper
 - **Training Data**: Current CF-cycle-1 experiments use the `current4` suite (CommonsenseQA, ARC Science, GSM8K Math, Digital Twin). Historical saved runs may use the original 3-task reasoning suite.
 - **Benchmark Scale**: Most results are from single-seed experiments. Multi-seed and cross-domain evaluations are needed to confirm generalizability, and BWT should not be compared across task suites without a recorded manifest.
 
